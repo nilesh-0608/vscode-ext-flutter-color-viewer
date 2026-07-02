@@ -176,4 +176,32 @@ suite('UnifiedColorProvider Test Suite', () => {
         assert.strictEqual(colors.length, 1);
         assert.ok(colors[0] instanceof ColorInformation);
     });
+
+    test('should skip settings.json to avoid duplicate pickers with VS Code built-in', () => {
+        const mockDocument = {
+            languageId: 'jsonc',
+            fileName: '/Users/test/.vscode/settings.json',
+            getText: () => '"#FF0000"',
+        } as TextDocument;
+
+        const colors = provider.provideDocumentColors(mockDocument);
+
+        // settings.json should be skipped entirely
+        assert.strictEqual(colors, undefined);
+    });
+
+    test('should still provide colors for non-settings JSON files', () => {
+        const mockDocument = {
+            languageId: 'json',
+            fileName: '/Users/test/project/package.json',
+            getText: () => '"#FF0000"',
+        } as TextDocument;
+
+        const colors = provider.provideDocumentColors(mockDocument);
+
+        // Other JSON files should work normally
+        assert.ok(Array.isArray(colors));
+        assert.strictEqual(colors.length, 1);
+        assert.ok(colors[0] instanceof ColorInformation);
+    });
 });

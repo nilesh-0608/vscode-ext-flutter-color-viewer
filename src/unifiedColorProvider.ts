@@ -1,3 +1,4 @@
+import * as path from "path";
 import {
   DocumentColorProvider,
   TextDocument,
@@ -59,6 +60,11 @@ class UnifiedColorProvider implements DocumentColorProvider {
   ): ProviderResult<ColorInformation[]> {
     const excludedLanguages = ["css", "less", "scss"];
     if (excludedLanguages.includes(document.languageId)) {
+      return;
+    }
+
+    // VS Code has built-in color provider for settings.json, skip to avoid duplicate pickers
+    if (path.basename(document.fileName) === "settings.json") {
       return;
     }
 
